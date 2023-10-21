@@ -18,8 +18,6 @@ else:
 coloumns = ['Event','White','Black','Result','UTCDate','UTCTime','WhiteElo','BlackElo','WhiteRatingDiff','BlackRatingDiff','ECO','Opening','TimeControl','Termination','AN']
 
 df = pd.read_csv(name, names= coloumns)[:10]
-
-print(df)
 # prepare massives
 
 combination_code = ''
@@ -60,7 +58,6 @@ for histories_index, this_history in enumerate(histories):
     combination_code = [PIECE_SYMBOLS_NEW.index(piece(board, cell)) for cell in range(64)] 
 
     for index, key in enumerate(histories[histories_index].split()[:10]):
-        print(key)
         board.push_san(key)
 
         if index % 2 == 0: 
@@ -75,3 +72,52 @@ for histories_index, this_history in enumerate(histories):
 
 print(fen_massive[0])
 print('Finished')
+
+fen_massive_unicum = list(set(fen_massive))
+
+print('Started..')
+
+fen_massive_unicum_counter = []
+
+for key in fen_massive_unicum:
+    fen_massive_unicum_counter.append([key,0,0,0,0])
+
+for index, key in enumerate(fen_massive_unicum_counter):
+    if index % 1000 == 0: print(index)
+    for index2, key2 in enumerate(fen_massive):
+        if key[0] == key2:
+            key[1] += 1
+            if y[index2] == 1: key[2] += 1 
+            else: key[3] += 1
+            key[4] = key[2]/key[1]
+
+print()
+print('Finished')
+
+# first moves specs
+
+board = chess.Board()
+fen = board.fen()
+
+win_persent = []
+legals = []
+
+
+for key in board.legal_moves:
+    legals.append(str(key))
+
+for index, legal_move in enumerate(legals):
+    board.push_san(legal_move)
+    fen = board.fen()
+
+# find combinations
+    for key in fen_massive_unicum_counter:
+        if fen == key[0]:
+            print(index, 'move:', legal_move, 'total:', key[1], 'wins:', key[2], 'percent:', key[4])
+            win_persent.append([legal_move, key[1], key[4]])
+
+            break
+    board.pop()
+
+print()
+print('len(win_percent):', len(win_persent))

@@ -39,17 +39,11 @@ def piece(board, cell):
     else:
         return '.'
 
-def refactor_histories(history): # fix sub func for delete all counts
-    temp = ""
-    while temp != history:
-        temp = history
-        history = re.sub(r'^[0-9]*[.]', r'', history)
 
-    return history
 
-histories = [key[:-4] for key in df.AN]  #create re for true split !fix
+histories = [key[:-4] for key in df.AN]
 
-histories = [refactor_histories(history)[1:] for history in histories]
+histories = [re.sub(r'[0-9]*[.]', r'', history)[1:] for history in histories]
 histories = [re.sub(r'  ', r' ', history) for history in histories]
 
 

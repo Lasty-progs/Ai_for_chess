@@ -1,9 +1,13 @@
-import chess, re #, keras
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+
+import chess, re, keras
 import pandas as pd
 import numpy as np
 import matplotlib as plt
-# from keras.models import Sequential
-# from keras.layers import Dense, Flatten
+from keras.models import Sequential
+from keras.layers import Dense, Flatten
 
 
 # load dataset
@@ -17,7 +21,8 @@ else:
 
 coloumns = ['Event','White','Black','Result','UTCDate','UTCTime','WhiteElo','BlackElo','WhiteRatingDiff','BlackRatingDiff','ECO','Opening','TimeControl','Termination','AN']
 
-df = pd.read_csv(name, names= coloumns)[:10]
+df = pd.read_csv(name, names= coloumns)
+# [:10]
 # prepare massives
 
 combination_code = ''
@@ -40,8 +45,12 @@ def piece(board, cell):
 
 
 histories = [key[:-4] for key in df.AN]
+filter_history = r'[0-9]*[.]+'
+# delete computer evals from histories
+# filter_eval_history = r'\{.*\} | ?+ | \!+'
 
-histories = [re.sub(r'[0-9]*[.]', r'', history)[1:] for history in histories]
+histories = [re.sub(filter_history, r'', history)[1:] for history in histories]
+# histories = [re.sub(filter_eval_history, r'', history) for history in histories]
 histories = [re.sub(r'  ', r' ', history) for history in histories]
 
 
@@ -49,6 +58,8 @@ histories = [re.sub(r'  ', r' ', history) for history in histories]
 status = [1 if key == '1-0' else 0 for key in df.Result]
 
 print('Started..') # flag for new block
+
+incorr_data = 0
 
 for histories_index, this_history in enumerate(histories):
     if histories_index % 1000 == 0: print(histories_index)
@@ -58,8 +69,11 @@ for histories_index, this_history in enumerate(histories):
     combination_code = [PIECE_SYMBOLS_NEW.index(piece(board, cell)) for cell in range(64)] 
 
     for index, key in enumerate(histories[histories_index].split()[:10]):
-        board.push_san(key)
-
+        try:
+            board.push_san(key)
+        except:
+            incorr_data += 1
+            break
         if index % 2 == 0: 
             fen = board.fen()
             combination_code = [PIECE_SYMBOLS_NEW.index(piece(board, cell)) for cell in range(64)]
@@ -121,3 +135,45 @@ for index, legal_move in enumerate(legals):
 
 print()
 print('len(win_percent):', len(win_persent))
+print('unreaded data: ', int(incorr_data/len(histories)*100), '%')
+
+# specs for 2nd move
+
+fen_massive_unicum_counter_2 = []
+for key in fen_massive_unicum_counter:
+  if key[0][-1] == '2' and key[0][-2] == ' ':
+    fen_massive_unicum_counter_2.append(key)
+
+fen_massive_unicum_2 = []
+for key in fen_massive_unicum_counter_2: 
+    fen_massive_unicum_2.append(key[0])
+
+fen_and_combination_code_unicum_2 = []
+for key in fen_massive_unicum_2:
+  for key2 in fen_and_code_combination:
+    if key == key2[0]:
+      fen_and_combination_code_unicum_2.append([key, key2[1]])
+      break 
+
+# create inputs for 2nd move
+x_train_2 = [ key[1] for key in fen_and_combination_code_unicum_2 ]
+
+y_train_2 = [ ( 1 if key[4] > 0.5 else 0 )for key in fen_massive_unicum_counter_2 ]
+
+x_train = np.array([ [ int(key2) for key2 in key  ] for key in x_train_2  ])
+
+y_train = np.array([int(key) for key in y_train_2])
+
+# model for 2nd move
+model_1 = keras.Sequential([
+    Dense(128, activation='relu', input_shape=(64,)),
+    Dense(1, activation='sigmoid')
+])
+
+myAdam = keras.optimizers.Adam(learning_rate=0.0001)
+model_1.compile(optimizer=myAdam,
+             loss='binary_crossentropy',
+             metrics=['accuracy'])
+
+Epochs = 100
+history_1 = model_1.fit(x_train, y_train, batch_size=32, epochs=Epochs, validation_split=0.2)

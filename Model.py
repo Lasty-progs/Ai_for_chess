@@ -5,9 +5,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import chess, re, keras
 import pandas as pd
 import numpy as np
-import matplotlib as plt
+from matplotlib import pyplot as plt
 from keras.models import Sequential
-from keras.layers import Dense, Flatten
+from keras.layers import Dense
 
 
 # load dataset
@@ -22,7 +22,6 @@ else:
 coloumns = ['Event','White','Black','Result','UTCDate','UTCTime','WhiteElo','BlackElo','WhiteRatingDiff','BlackRatingDiff','ECO','Opening','TimeControl','Termination','AN']
 
 df = pd.read_csv(name, names= coloumns)
-# [:10]
 # prepare massives
 
 combination_code = ''
@@ -47,11 +46,11 @@ def piece(board, cell):
 histories = [key[:-4] for key in df.AN]
 filter_history = r'[0-9]*[.]+'
 # delete computer evals from histories
-# filter_eval_history = r'\{.*\} | ?+ | \!+'
+filter_eval_history = r'\{.*\}|\?+|\!+'
 
 histories = [re.sub(filter_history, r'', history)[1:] for history in histories]
-# histories = [re.sub(filter_eval_history, r'', history) for history in histories]
-histories = [re.sub(r'  ', r' ', history) for history in histories]
+histories = [re.sub(filter_eval_history, r'', history) for history in histories]
+histories = [re.sub(r'  |   ', r' ', history) for history in histories]
 
 
 
@@ -160,12 +159,12 @@ x_train_2 = [ key[1] for key in fen_and_combination_code_unicum_2 ]
 
 y_train_2 = [ ( 1 if key[4] > 0.5 else 0 )for key in fen_massive_unicum_counter_2 ]
 
-x_train = np.array([ [ int(key2) for key2 in key  ] for key in x_train_2  ])
+x_train = np.array([ [ int(key2) for key2 in key ] for key in x_train_2  ])
 
 y_train = np.array([int(key) for key in y_train_2])
 
 # model for 2nd move
-model_1 = keras.Sequential([
+model_1 = Sequential([
     Dense(128, activation='relu', input_shape=(64,)),
     Dense(1, activation='sigmoid')
 ])
@@ -177,3 +176,11 @@ model_1.compile(optimizer=myAdam,
 
 Epochs = 100
 history_1 = model_1.fit(x_train, y_train, batch_size=32, epochs=Epochs, validation_split=0.2)
+
+plt.plot(history_1.history['accuracy'])
+plt.plot(history_1.history['val_accuracy'])
+plt.title("model accuracy")
+plt.ylabel("accuracy")
+plt.xlabel("epoch")
+plt.legend(["train", 'test'], loc="upper left")
+plt.show()

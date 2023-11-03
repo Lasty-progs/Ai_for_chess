@@ -6,12 +6,13 @@ class DataSet:
     -use for_model() for get wins, history dataframe \n
     -use for_analysis() for get all meta information about games without history'''
 
-    def for_model(self, rows=0) -> pd.DataFrame:
+    def for_model(self, rows=0, start=0) -> pd.DataFrame:
         self.__read_files(rows)
         self.data = pd.concat([self.__set_winner(self.__game_data["Winner"]),
                                 self.__split_fen(self.__game_fen["FEN"])], axis=1)
 
         self.data = self.data[self.data["Winner"] >= 0]
+        self.data = self.data.rename(columns={"Winner":"win", "FEN":"history"})
         self.data.reset_index(drop=True, inplace=True)
         return self.data
     
@@ -41,7 +42,7 @@ class DataSet:
         # delete computer evals from histories
         # filter_eval_history = r'\{.*\}|\?+|\!+'
 
-        histories = histories.map(lambda x:re.sub(filter_history, r'', x)[:-6])
+        histories = histories.map(lambda x:re.sub(filter_history, r'', x)[:-5])
         # histories.map(lambda x:re.sub(filter_eval_history, r'', x))
         histories = histories.map(lambda x:x.split())
 

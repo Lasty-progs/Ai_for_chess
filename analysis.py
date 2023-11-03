@@ -5,7 +5,7 @@ from Data.Data import DataSet
 
 df = DataSet().for_analysis(30)
 
-print(df["Winner"])
+print([x for x in df["Termination"]])
 
 # elo = pd.concat([df['WhiteElo'], df['BlackElo']])
 

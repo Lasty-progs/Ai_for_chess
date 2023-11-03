@@ -1,7 +1,6 @@
 import chess
 import numpy as np
 
-from Data import DataSet
 
 
 class ModelData:
@@ -13,7 +12,7 @@ class ModelData:
 
     def __load(self, rows): #Create validation of histories
         self.data = DataSet().for_model(rows)
-        board = chess.Board()
+        # board = chess.Board()
        
 
     def create_inputs(self) -> (np.array, np.array): # create operations if black wins
@@ -68,5 +67,10 @@ class ModelData:
         return UNICODE_TO_BYTES[x]
 
 
-# x, y = ModelData(200).create_inputs()
-# print(np.shape(x))
+if __name__ == '__main__':
+    from Data import DataSet
+
+    x, y = ModelData(200).create_inputs()
+    print(np.shape(x))
+else:
+    from .Data import DataSet

@@ -12,7 +12,6 @@ class ModelData:
 
     def __load(self, rows): #Create validation of histories
         self.data = DataSet().for_model(rows)
-        # board = chess.Board()
        
 
     def create_inputs(self) -> (np.array, np.array): # create operations if black wins
@@ -24,10 +23,12 @@ class ModelData:
                     if i%2:
                         for avaliable in board.legal_moves:
                             board.push_san(move)
-                            self.x.append(np.array([*bin_board, *ModelData.convert_unicode(board.unicode())]))
                             if avaliable == board.pop():
                                 self.y.append(1)
                             else: self.y.append(0)
+                            board.push(avaliable)
+                            self.x.append(np.array([*bin_board, *ModelData.convert_unicode(board.unicode())]))
+                            board.pop()
                         board.push_san(move)
                     else:
                         board.push_san(move)   
@@ -70,7 +71,7 @@ class ModelData:
 if __name__ == '__main__':
     from Data import DataSet
 
-    x, y = ModelData(200).create_inputs()
+    x, y = ModelData(20).create_inputs()
     print(np.shape(x))
 else:
     from .Data import DataSet

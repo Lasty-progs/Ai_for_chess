@@ -9,5 +9,5 @@ from keras.layers import Dense
 from Data.Data import DataSet
 
 data = DataSet().for_model(30)
-print(data)
-# Carefully there are many draws(-1) in data
+print(data["FEN"][0])
+

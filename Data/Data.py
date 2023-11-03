@@ -10,7 +10,9 @@ class DataSet:
         self.__read_files(rows)
         self.data = pd.concat([self.__set_winner(self.__game_data["Winner"]),
                                 self.__split_fen(self.__game_fen["FEN"])], axis=1)
-        
+
+        self.data = self.data[self.data["Winner"] >= 0]
+        self.data.reset_index(drop=True, inplace=True)
         return self.data
     
     def for_analysis(self, rows=0) -> pd.DataFrame:
@@ -33,17 +35,17 @@ class DataSet:
         else:
             self.__game_fen = pd.read_csv("dataset/Lichess_2013_2014_FEN.csv")
 
-    def __split_fen(self, history:pd.Series) -> pd.Series:
-        return history
+    def __split_fen(self, histories:pd.Series) -> pd.Series:
+        # return histories
         filter_history = r'[0-9]*[.]+'
         # delete computer evals from histories
-        filter_eval_history = r'\{.*\}|\?+|\!+'
+        # filter_eval_history = r'\{.*\}|\?+|\!+'
 
-        histories = [re.sub(filter_history, r'', history)[1:] for history in histories]
-        histories = [re.sub(filter_eval_history, r'', history) for history in histories]
+        histories = histories.map(lambda x:re.sub(filter_history, r'', x)[:-6])
+        # histories.map(lambda x:re.sub(filter_eval_history, r'', x))
+        histories = histories.map(lambda x:x.split())
 
-
-        status = [1 if key == '1-0' else 0 for key in df.Result]
+        return histories
 
     def __set_winner(self, winner:pd.Series) -> pd.Series:
         winner = winner.map(lambda x:1 if x == "White" else 0 if x == "Black" else -1)

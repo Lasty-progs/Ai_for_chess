@@ -5,7 +5,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from keras.losses import binary_crossentropy
-
+import matplotlib.pyplot as plt
 
 # 512 ins 1 out
 # activation out simoid
@@ -26,12 +26,19 @@ class Model:
                     metrics=['accuracy'])
 
         Epochs = 100
-        self.model.fit(x_train, y_train, batch_size=32, epochs=Epochs, validation_split=0.4)
+        history = self.model.fit(x_train, y_train, batch_size=32, epochs=Epochs, validation_split=0.4)
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title("model loss")
+        plt.ylabel("loss")
+        plt.xlabel("epoch")
+        plt.legend(["train", 'test'], loc="upper left")
+        plt.savefig("loss.png")
 
 if __name__ == '__main__':
     from Data.ModelData import ModelData
 
-    x, y = ModelData(20).create_inputs()
+    x, y = ModelData(200).create_inputs()
     model = Model()
     model.main(x, y)
 else:

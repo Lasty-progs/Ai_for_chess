@@ -1,5 +1,6 @@
 import chess
 import numpy as np
+from random import randint
 
 
 
@@ -21,14 +22,28 @@ class ModelData:
             if win:
                 for i, move in enumerate(history):
                     if i%2:
-                        for avaliable in board.legal_moves:
-                            board.push_san(move)
-                            if avaliable == board.pop():
-                                self.y.append(1)
-                            else: self.y.append(0)
-                            board.push(avaliable)
+                         
+                        legal = []
+                        [legal.append(x) for x in board.legal_moves]
+                        board.push_san(move)
+                        self.x.append(np.array([*bin_board, *ModelData.convert_unicode(board.unicode())]))
+                        self.y.append(1)
+                        lose = legal[randint(0, len(legal) - 1)]
+                        if board.pop() != lose:
+                            self.y.append(0)
+                            board.push(lose)
                             self.x.append(np.array([*bin_board, *ModelData.convert_unicode(board.unicode())]))
                             board.pop()
+
+                        # Old variant of create
+                        # for avaliable in board.legal_moves:
+                        #     board.push_san(move)
+                        #     if avaliable == board.pop():
+                        #         self.y.append(1)
+                        #     else: self.y.append(0)
+                        #     board.push(avaliable)
+                        #     self.x.append(np.array([*bin_board, *ModelData.convert_unicode(board.unicode())]))
+                        #     board.pop()
                         board.push_san(move)
                     else:
                         board.push_san(move)   
@@ -71,7 +86,7 @@ class ModelData:
 if __name__ == '__main__':
     from Data import DataSet
 
-    x, y = ModelData(20).create_inputs()
+    x, y = ModelData(1).create_inputs()
     print(np.shape(x))
 else:
     from .Data import DataSet

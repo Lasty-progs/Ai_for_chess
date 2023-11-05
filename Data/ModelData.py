@@ -5,14 +5,14 @@ from random import randint
 
 
 class ModelData:
-    def __init__(self, rows=0):
+    def __init__(self, rows=0, start=1):
         self.x = []
         self.y = []
-        self.__load(rows)
+        self.__load(rows, start)
 
 
-    def __load(self, rows):
-        self.data = DataSet().for_model(rows)
+    def __load(self, rows, start):
+        self.data = DataSet().for_model(rows, start)
        
 
     def create_inputs(self) -> (np.array, np.array):
@@ -51,7 +51,8 @@ class ModelData:
 
                     board.push_san(move)
                 else:
-                    board.push_san(move)
+                    try: board.push_san(move)
+                    except: break
 
         return (np.array(self.x),np.array(self.y))
 
@@ -92,7 +93,7 @@ class ModelData:
 if __name__ == '__main__':
     from Data import DataSet
 
-    x, y = ModelData(200).create_inputs()
+    x, y = ModelData(2, 1).create_inputs()
     print(np.shape(x))
 else:
     from .Data import DataSet

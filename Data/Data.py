@@ -6,8 +6,8 @@ class DataSet:
     -use for_model() for get wins, history dataframe \n
     -use for_analysis() for get all meta information about games without history'''
 
-    def for_model(self, rows=0, start=0) -> pd.DataFrame:
-        self.__read_files(rows)
+    def for_model(self, rows=0, start=1) -> pd.DataFrame:
+        self.__read_files(rows, start)
         self.data = pd.concat([self.__set_winner(self.__game_data["Winner"]),
                                 self.__split_fen(self.__game_fen["FEN"])], axis=1)
 
@@ -20,19 +20,25 @@ class DataSet:
         self.__read_game_data(rows)
         return self.__game_data
 
-    def __read_files(self, rows=0) -> None:
-        self.__read_game_data(rows)
-        self.__read_game_fen(rows)
+    def __read_files(self, rows=0, start=1) -> None:
+        self.__read_game_data(rows, start)
+        self.__read_game_fen(rows, start)
 
-    def __read_game_data(self, rows=0) -> None:
+    def __read_game_data(self, rows=0, start=1) -> None:
         if rows:
-            self.__game_data = pd.read_csv("dataset/Lichess_2013_2014_Complete.csv", nrows=rows)
+            self.__game_data = pd.read_csv("dataset/Lichess_2013_2014_Complete.csv", nrows=1)
+            cols = self.__game_data.columns.to_list()
+            self.__game_data = pd.read_csv(
+                "dataset/Lichess_2013_2014_Complete.csv", nrows=rows, skiprows=start, names=cols)
         else:
             self.__game_data = pd.read_csv("dataset/Lichess_2013_2014_Complete.csv")
 
-    def __read_game_fen(self, rows=0) -> None:
+    def __read_game_fen(self, rows=0, start=1) -> None:
         if rows:
-            self.__game_fen = pd.read_csv("dataset/Lichess_2013_2014_FEN.csv", nrows=rows)
+            self.__game_fen = pd.read_csv("dataset/Lichess_2013_2014_FEN.csv", nrows=1)
+            cols = self.__game_fen.columns.to_list()
+            self.__game_fen = pd.read_csv(
+                "dataset/Lichess_2013_2014_FEN.csv", nrows=rows, skiprows=start, names=cols)
         else:
             self.__game_fen = pd.read_csv("dataset/Lichess_2013_2014_FEN.csv")
 

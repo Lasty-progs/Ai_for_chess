@@ -8,8 +8,6 @@ from keras.losses import binary_crossentropy
 from keras.saving import load_model
 import matplotlib.pyplot as plt
 
-import chess
-# import numpy as np
 
 class Model:
 
@@ -71,15 +69,21 @@ if __name__ == '__main__':
     model.create_model()
     # board = chess.Board()
     # board.push_san("e2e4")
+
+    x, y = ModelData(200, 1).create_inputs()
+    print("Pack loaded")
+    model.fit(x, y, batch_size=128, epochs=100, validation_split=0.2)
+    
     # print(model.predict(board, 1))
 
-    model.fit_all(pack_size=10000, batch_size=400, epochs=20, validation_split=0.2)
+    model.save_model()
+
+    # model.fit_all(pack_size=10000, batch_size=400, epochs=20, validation_split=0.2)
     model.create_plot("loss")
     model.create_plot("accuracy")
     # model.save_model()
 
 
 else:
-    from .Data.ModelData import ModelData
-    from .Data.PredictData import prepare_predict
-
+    from Data.ModelData import ModelData
+    from Data.PredictData import prepare_predict

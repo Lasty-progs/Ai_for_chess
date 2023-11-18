@@ -27,10 +27,10 @@ class Model:
         
     
     def save_model(self) -> None:
-        self.model.save("saved_model/")
+        self.model.save("src/saved_model/")
 
     def load_model(self) -> None:
-        self.model = load_model("saved_model/")
+        self.model = load_model("src/saved_model/")
 
     def fit(self, x, y, batch_size=128, epochs=100, validation_split=0.2):
         self.history = self.model.fit(x=x,y=y, batch_size=batch_size,
@@ -90,5 +90,6 @@ if __name__ == '__main__':
 
 
 else:
-    from Data.ModelData import ModelData
-    from Data.PredictData import prepare_predict
+    from .Data.ModelData import ModelData
+    from .Data.PredictData import prepare_predict
+

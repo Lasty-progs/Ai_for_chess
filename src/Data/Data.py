@@ -3,8 +3,8 @@ import re
 
 class DataSet:
     '''Class for operating data for model fiting or analysis \n
-    -use for_model() for get wins, history dataframe \n
-    -use for_analysis() for get all meta information about games without history'''
+    -use for_model() for get wins, history dataframe'''
+    # -use for_analysis() for get all meta information about games without history
 
     def for_model(self, rows=0, start=1) -> pd.DataFrame:
         self.__read_files(rows, start)
@@ -16,9 +16,9 @@ class DataSet:
         self.data.reset_index(drop=True, inplace=True)
         return self.data
     
-    def for_analysis(self, rows=0) -> pd.DataFrame:
-        self.__read_game_data(rows)
-        return self.__game_data
+    # def for_analysis(self, rows=0) -> pd.DataFrame:
+    #     self.__read_game_data(rows)
+    #     return self.__game_data
 
     def __read_files(self, rows=0, start=1) -> None:
         self.__read_game_data(rows, start)

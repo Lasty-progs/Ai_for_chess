@@ -3,7 +3,7 @@ import numpy as np
 
 
 # colour for bot 1-white, 0-black
-def prepare_predict(board:chess.Board, colour:bool): #add support for black
+def prepare_predict(board:chess.Board, colour:bool):
     """colour for model - 1 if white else 0"""
     moves = []
     ins = []

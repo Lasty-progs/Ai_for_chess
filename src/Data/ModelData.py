@@ -97,13 +97,3 @@ if __name__ == '__main__':
     print(np.shape(x))
 else:
     from .Data import DataSet
-
-                        # Old variant of create
-                        # for avaliable in board.legal_moves:
-                        #     board.push_san(move)
-                        #     if avaliable == board.pop():
-                        #         self.y.append(1)
-                        #     else: self.y.append(0)
-                        #     board.push(avaliable)
-                        #     self.x.append(np.array([*bin_board, *ModelData.convert_unicode(board.unicode())]))
-                        #     board.pop()
